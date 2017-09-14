@@ -5,6 +5,9 @@ import InputMask from 'inputmask-core'
 var KEYCODE_Z = 90
 var KEYCODE_Y = 89
 
+var isAndroid = typeof navigator !== 'undefined' &&
+  navigator.userAgent.match(/Android/i);
+
 function isUndo(e) {
   return (e.ctrlKey || e.metaKey) && e.keyCode === (e.shiftKey ? KEYCODE_Y : KEYCODE_Z)
 }
@@ -208,6 +211,10 @@ class MaskedInput extends React.Component {
       if (this.props.onChange) {
         this.props.onChange(e)
       }
+      // Needed for Android Chrome Galaxy S
+      if (isAndroid) {
+        setTimeout(this._updateInputSelection, 0)
+      }
     }
   }
 
@@ -233,12 +240,7 @@ class MaskedInput extends React.Component {
   }
 
   _keyPressPropName() {
-    if (typeof navigator !== 'undefined') {
-      return navigator.userAgent.match(/Android/i)
-      ? 'onBeforeInput'
-      : 'onKeyPress'
-    }
-    return 'onKeyPress'
+    return isAndroid ? 'onBeforeInput' : 'onKeyPress';
   }
 
   _getEventHandlers() {
